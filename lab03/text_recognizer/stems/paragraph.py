@@ -50,6 +50,5 @@ class ParagraphStem(ImageStem):
     def resize(self, img):
         if self.scale_factor == 1:
             return img
-        else:
-            out_shape = (img.width // self.scale_factor, img.height // self.scale_factor)
-            return img.resize(out_shape, resample=Image.BILINEAR)
+        out_shape = (img.width // self.scale_factor, img.height // self.scale_factor)
+        return img.resize(out_shape, resample=Image.BILINEAR)

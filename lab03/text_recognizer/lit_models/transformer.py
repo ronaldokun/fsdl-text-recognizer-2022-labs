@@ -48,9 +48,7 @@ class TransformerLitModel(BaseImageToTextLitModel):
 
         self.log("train/loss", loss)
 
-        outputs = {"loss": loss}
-
-        return outputs
+        return {"loss": loss}
 
     def validation_step(self, batch, batch_idx):
         x, y = batch

@@ -78,10 +78,11 @@ class IAM(BaseDataModule):
 
     @cachedproperty
     def split_by_id(self):
-        split_by_id = {id_: "train" for id_ in self.train_ids}
-        split_by_id.update({id_: "val" for id_ in self.validation_ids})
-        split_by_id.update({id_: "test" for id_ in self.test_ids})
-        return split_by_id
+        return (
+            {id_: "train" for id_ in self.train_ids}
+            | {id_: "val" for id_ in self.validation_ids}
+            | {id_: "test" for id_ in self.test_ids}
+        )
 
     @cachedproperty
     def line_strings_by_id(self):
@@ -112,8 +113,9 @@ def _get_ids_from_lwitlrt_split_file(filename: str) -> List[str]:
     with open(filename, "r") as f:
         line_ids_str = f.read()
     line_ids = line_ids_str.split("\n")
-    page_ids = list({"-".join(line_id.split("-")[:2]) for line_id in line_ids if line_id})
-    return page_ids
+    return list(
+        {"-".join(line_id.split("-")[:2]) for line_id in line_ids if line_id}
+    )
 
 
 def _get_line_strings_from_xml_file(filename: str) -> List[str]:

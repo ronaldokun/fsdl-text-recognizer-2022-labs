@@ -141,8 +141,7 @@ def main():
 
     trainer.test(lit_model, datamodule=data)
 
-    best_model_path = checkpoint_callback.best_model_path
-    if best_model_path:
+    if best_model_path := checkpoint_callback.best_model_path:
         rank_zero_info(f"Best model saved at: {best_model_path}")
 
 
