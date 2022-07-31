@@ -59,16 +59,15 @@ class IAMParagraphs(BaseDataModule):
             crops, labels = get_paragraph_crops_and_labels(iam=iam, split=split)
             save_crops_and_labels(crops=crops, labels=labels, split=split)
 
-            properties.update(
-                {
-                    id_: {
-                        "crop_shape": crops[id_].size[::-1],
-                        "label_length": len(label),
-                        "num_lines": _num_lines(label),
-                    }
-                    for id_, label in labels.items()
+            properties |= {
+                id_: {
+                    "crop_shape": crops[id_].size[::-1],
+                    "label_length": len(label),
+                    "num_lines": _num_lines(label),
                 }
-            )
+                for id_, label in labels.items()
+            }
+
 
         with open(PROCESSED_DATA_DIRNAME / "_properties.json", "w") as f:
             json.dump(properties, f, indent=4)
@@ -132,7 +131,7 @@ def get_paragraph_crops_and_labels(iam: IAM, split: str) -> Tuple[Dict[str, Imag
     labels = {}
     for form_filename in iam.form_filenames:
         id_ = form_filename.stem
-        if not iam.split_by_id[id_] == split:
+        if iam.split_by_id[id_] != split:
             continue
         image = Image.open(form_filename)
         image = ImageOps.grayscale(image)
@@ -140,11 +139,12 @@ def get_paragraph_crops_and_labels(iam: IAM, split: str) -> Tuple[Dict[str, Imag
 
         line_regions = iam.line_regions_by_id[id_]
         para_bbox = [
-            min([_["x1"] for _ in line_regions]),
-            min([_["y1"] for _ in line_regions]),
-            max([_["x2"] for _ in line_regions]),
-            max([_["y2"] for _ in line_regions]),
+            min(_["x1"] for _ in line_regions),
+            min(_["y1"] for _ in line_regions),
+            max(_["x2"] for _ in line_regions),
+            max(_["y2"] for _ in line_regions),
         ]
+
         lines = iam.line_strings_by_id[id_]
 
         crops[id_] = image.crop(para_bbox)

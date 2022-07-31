@@ -35,7 +35,7 @@ class BaseLitModel(pl.LightningModule):
         if loss not in ("transformer",):
             self.loss_fn = getattr(torch.nn.functional, loss)
 
-        self.one_cycle_max_lr = self.args.get("one_cycle_max_lr", None)
+        self.one_cycle_max_lr = self.args.get("one_cycle_max_lr")
         self.one_cycle_total_steps = self.args.get("one_cycle_total_steps", ONE_CYCLE_TOTAL_STEPS)
 
         self.train_acc = Accuracy()
@@ -74,9 +74,7 @@ class BaseLitModel(pl.LightningModule):
         self.log("train/loss", loss)
         self.log("train/acc", self.train_acc, on_step=False, on_epoch=True)
 
-        outputs = {"loss": loss}
-
-        return outputs
+        return {"loss": loss}
 
     def _run_on_batch(self, batch, with_preds=False):
         x, y = batch
@@ -92,9 +90,7 @@ class BaseLitModel(pl.LightningModule):
         self.log("validation/loss", loss, prog_bar=True, sync_dist=True)
         self.log("validation/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
 
-        outputs = {"loss": loss}
-
-        return outputs
+        return {"loss": loss}
 
     def test_step(self, batch, batch_idx):
         x, y, logits, loss = self._run_on_batch(batch)
